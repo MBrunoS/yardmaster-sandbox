@@ -1,19 +1,9 @@
 name: Mergease sandbox
-run-name: ${{ inputs.correlation_id }}
 
-on:
-  workflow_dispatch:
-    inputs:
-      correlation_id:
-        description: Mergease dispatch correlation ID
-        required: true
-        type: string
+on: workflow_dispatch
 
 jobs:
   complete:
     runs-on: ubuntu-latest
     steps:
-      - name: Confirm correlation
-        env:
-          CORRELATION_ID: ${{ inputs.correlation_id }}
-        run: printf "%s\n" "$CORRELATION_ID"
+      - run: echo "Mergease sandbox workflow completed"
