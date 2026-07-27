@@ -1,9 +1,0 @@
-name: Mergease sandbox
-
-on: workflow_dispatch
-
-jobs:
-  complete:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Mergease sandbox workflow completed"

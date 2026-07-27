@@ -1,0 +1,22 @@
+name: Yardmaster candidate validation
+on:
+  workflow_dispatch:
+    inputs:
+      attempt_id:          { required: true, type: string }
+      pull_request_number: { required: true, type: string }
+      expected_head_sha:   { required: true, type: string }
+      expected_base_sha:   { required: true, type: string }
+      candidate_sha:       { required: true, type: string }
+      contract_version:    { required: true, type: string }
+permissions:
+  contents: read
+jobs:
+  validate:
+    name: Validate exact candidate (sandbox stub)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify workflow contract
+        env:
+          CONTRACT_VERSION: ${{ inputs.contract_version }}
+        run: test "$CONTRACT_VERSION" = "1"
