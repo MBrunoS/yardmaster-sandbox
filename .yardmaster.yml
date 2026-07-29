@@ -1,0 +1,10 @@
+queue:
+  target: master
+  strategy: fifo
+  concurrency: 1
+
+pull_requests:
+  require_ready_for_review: true
+  allow_labels:
+    - demo
+    - ready-to-merge
