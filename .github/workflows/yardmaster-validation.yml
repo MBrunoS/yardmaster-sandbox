@@ -10,7 +10,7 @@ on:
       contract_version:    { required: true, type: string }
 permissions:
   contents: read
-# QA markers in the candidate: qa/FAIL fails, qa/SLOW runs 4 minutes, qa/HANG exceeds the job
+# QA markers in the candidate: qa/FAIL fails, qa/SLOW runs 150 seconds, qa/HANG exceeds the job
 # timeout, qa/NORUNNER requests a runner label that does not exist so the job never starts.
 jobs:
   inspect:
@@ -45,6 +45,6 @@ jobs:
       - name: Apply QA markers
         run: |
           if [ -e qa/FAIL ]; then echo "qa/FAIL marker present"; exit 1; fi
-          if [ -e qa/SLOW ]; then sleep 240; fi
+          if [ -e qa/SLOW ]; then sleep 150; fi
           if [ -e qa/HANG ]; then sleep 400; fi
           echo "candidate passed"
