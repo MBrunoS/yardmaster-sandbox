@@ -10,13 +10,41 @@ on:
       contract_version:    { required: true, type: string }
 permissions:
   contents: read
+# QA markers in the candidate: qa/FAIL fails, qa/SLOW runs 4 minutes, qa/HANG exceeds the job
+# timeout, qa/NORUNNER requests a runner label that does not exist so the job never starts.
 jobs:
-  validate:
-    name: Validate exact candidate (sandbox stub)
+  inspect:
+    name: Inspect candidate markers
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
+    outputs:
+      runner: ${{ steps.markers.outputs.runner }}
     steps:
       - name: Verify workflow contract
         env:
           CONTRACT_VERSION: ${{ inputs.contract_version }}
         run: test "$CONTRACT_VERSION" = "1"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate_sha }}
+      - name: Verify the checked-out commit is the candidate
+        run: test "$(git rev-parse HEAD)" = "${{ inputs.candidate_sha }}"
+      - id: markers
+        run: |
+          if [ -e qa/NORUNNER ]; then echo "runner=yardmaster-qa-missing-runner" >> "$GITHUB_OUTPUT"
+          else echo "runner=ubuntu-latest" >> "$GITHUB_OUTPUT"; fi
+  validate:
+    name: Validate exact candidate (sandbox stub)
+    needs: inspect
+    runs-on: ${{ needs.inspect.outputs.runner }}
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate_sha }}
+      - name: Apply QA markers
+        run: |
+          if [ -e qa/FAIL ]; then echo "qa/FAIL marker present"; exit 1; fi
+          if [ -e qa/SLOW ]; then sleep 240; fi
+          if [ -e qa/HANG ]; then sleep 400; fi
+          echo "candidate passed"
